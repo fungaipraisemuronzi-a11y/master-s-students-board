@@ -22,20 +22,40 @@ app.use(
 );
 
 /* LOGIN PAGE */
-app.get("/", (req, res) => {
-  res.render("login");
-});
-
-/* LOGIN POST */
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { password } = req.body;
 
-  if (password === process.env.PASSWORD) {
-    req.session.loggedIn = true;
+  const result = await db.query("SELECT * FROM admin LIMIT 1");
+
+  if (password === result.rows[0].password) {
+    req.session.user = true;
     res.redirect("/home");
   } else {
     res.send("Wrong password");
   }
+});
+
+// Show change password page
+app.get("/change-password", checkAuth, (req, res) => {
+  res.render("change-password");
+});
+
+// Handle password change
+app.post("/change-password", checkAuth, async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  const result = await db.query("SELECT * FROM admin LIMIT 1");
+
+  if (oldPassword !== result.rows[0].password) {
+    return res.send("Old password incorrect");
+  }
+
+  await db.query(
+    "UPDATE admin SET password=$1 WHERE id=$2",
+    [newPassword, result.rows[0].id]
+  );
+
+  res.redirect("/home");
 });
 
 /* AUTH MIDDLEWARE */
