@@ -6,6 +6,8 @@ require("dotenv").config();
 const app = express();
 const db = require("./database");
 
+
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
@@ -21,6 +23,13 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.redirect("/login");
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
 /* LOGIN PAGE */
 app.post("/login", async (req, res) => {
   const { password } = req.body;
@@ -28,7 +37,7 @@ app.post("/login", async (req, res) => {
   const result = await db.query("SELECT * FROM admin LIMIT 1");
 
   if (password === result.rows[0].password) {
-    req.session.user = true;
+    req.session.loggedIn = true;
     res.redirect("/home");
   } else {
     res.send("Wrong password");
@@ -46,16 +55,22 @@ app.post("/change-password", checkAuth, async (req, res) => {
 
   const result = await db.query("SELECT * FROM admin LIMIT 1");
 
-  if (oldPassword !== result.rows[0].password) {
+  if (result.rows.length === 0) {
+    return res.send("No admin user found");
+  }
+
+  const admin = result.rows[0];
+
+  if (oldPassword !== admin.password) {
     return res.send("Old password incorrect");
   }
 
   await db.query(
     "UPDATE admin SET password=$1 WHERE id=$2",
-    [newPassword, result.rows[0].id]
+    [newPassword, admin.id]
   );
 
-  res.redirect("/home");
+  res.send("Password updated successfully");
 });
 
 /* AUTH MIDDLEWARE */
