@@ -15,6 +15,10 @@ h2 {
     margin: 0;
 }
 
+.tar{
+    font-size: 30px;
+}
+
 /* CONTAINER */
 .container {
     width: 95%;
@@ -26,6 +30,7 @@ h2 {
 /* LINKS */
 a {
     text-decoration: none;
+    font-size: x-large;
     color: #007bff;
 }
 
