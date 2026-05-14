@@ -8,7 +8,7 @@
 
     <div class="container">
         
-<h2><%= period.name %></h2>
+<h1><%= period.name %></h1>
 <div class="card">
 <form method="POST" action="/update-target">
     <input type="hidden" name="period_id" value="<%= period.id %>">
@@ -27,7 +27,7 @@
 </div>  
 
 <div class="card">
-<h2>Students</h2>
+<h1>Students</h1>
 
 <ol>
 <% students.forEach(student => { 
